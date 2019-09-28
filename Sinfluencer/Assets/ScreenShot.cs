@@ -10,6 +10,9 @@ public class ScreenShot : MonoBehaviour
     public GameObject canvas;
     public CanvasGroup cg;
 
+    public Camera charCam;
+    public Camera canCam;
+
     bool flash = false;
     float delay = 0;
 
@@ -24,7 +27,8 @@ public class ScreenShot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        print(Application.persistentDataPath);
+        canCam.enabled = false;
+        charCam.enabled = true;
     }
 
     // Update is called once per frame
@@ -47,13 +51,35 @@ public class ScreenShot : MonoBehaviour
             {
                 delay += Time.deltaTime;
                 if (delay >= .1)
+                {
+                    charCam.enabled = false;
+                    canCam.enabled = true;
                     cg.alpha = 1.0f;
+
+                    Texture2D tex = null;
+                    byte[] fileData;
+
+                    if (File.Exists(filePath))
+                    {
+                        fileData = File.ReadAllBytes(filePath);
+                        tex = new Texture2D(2, 2);
+                        tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+
+                        canvas.GetComponent<Renderer>().material.mainTexture = tex;
+                    }
+
+                    print("Rendered Screenshot");
+                }
+
             }
             else
             {
                 cg.alpha -= Time.deltaTime * .85f;
                 if (cg.alpha <= 0)
+                {
                     flash = false;
+                }
+                    
             }
         }
 
@@ -72,6 +98,7 @@ public class ScreenShot : MonoBehaviour
             }
 
             print("Rendered Screenshot");
+
         }
     }
 }
