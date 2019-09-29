@@ -18,12 +18,14 @@ public class ScreenShot : MonoBehaviour
     public Sprite[] suffering;
     public UnityEngine.UI.Image[] images;
 
+    public UnityEngine.Audio.AudioMixer mixer;
+
     bool flash = false;
     bool display = false;
     float delay = 0;
     float picTime = 0;
 
-    int corruption = 0;
+    float corruption = 0f;
 
 
     // Start is called before the first frame update
@@ -31,6 +33,8 @@ public class ScreenShot : MonoBehaviour
     {
         canCam.enabled = false;
         charCam.enabled = true;
+        suffering = Resources.LoadAll<Sprite>("");
+        mixer.SetFloat("ChorusDepth", corruption);
     }
 
     // Update is called once per frame
@@ -71,10 +75,12 @@ public class ScreenShot : MonoBehaviour
                     picTime = 3f;
                     display = true;
 
-                    for (int i = 0; i < images.Length; i++)
+                    foreach(UnityEngine.UI.Image i in images)
                     {
-                        images[i].sprite = suffering[i];
+                        int rand = Random.Range(0, suffering.Length);
+                        i.sprite = suffering[rand];
                     }
+                    UpdateMusic();
                 }
 
             }
@@ -91,9 +97,7 @@ public class ScreenShot : MonoBehaviour
 
         if (display)
         {
-            picTime -= Time.deltaTime;
-
-            if (picTime <= 0)
+            if (Input.GetMouseButtonDown(0))
             {
                 firstPerson.EnableMove(true);
                 display = false;
@@ -101,6 +105,17 @@ public class ScreenShot : MonoBehaviour
                 canCam.enabled = false;
             }
         }
+
+    }
+
+    void UpdateMusic()
+    {
+        corruption += .125f;
+        mixer.SetFloat("ChorusDepth", corruption);
+    }
+
+    void RandomizeImage(UnityEngine.UI.Image i)
+    {
 
     }
 }
