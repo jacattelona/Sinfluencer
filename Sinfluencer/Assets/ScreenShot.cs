@@ -5,6 +5,7 @@ using UnityEngine.Windows;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using System.IO;
+using UnityEngine.Rendering.PostProcessing;
 
 public class ScreenShot : MonoBehaviour
 {
@@ -27,6 +28,13 @@ public class ScreenShot : MonoBehaviour
     float picTime = 0;
 
     float corruption = 0f;
+    public PostProcessVolume volume;
+    ChromaticAberration chroma;
+    Vignette vignette;
+    LensDistortion whoops;
+    Bloom bloomboy;
+
+    public CanvasGroup pfordayquil;
 
 
     // Start is called before the first frame update
@@ -37,6 +45,10 @@ public class ScreenShot : MonoBehaviour
         charCam.enabled = true;
         suffering = Resources.LoadAll<Sprite>("");
         mixer.SetFloat("ChorusDepth", corruption);
+        volume.profile.TryGetSettings(out chroma);
+        volume.profile.TryGetSettings(out vignette);
+        volume.profile.TryGetSettings(out whoops);
+        volume.profile.TryGetSettings(out bloomboy);
     }
 
     // Update is called once per frame
@@ -45,6 +57,7 @@ public class ScreenShot : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P) && !display)
         {
             ScreenCapture.CaptureScreenshot(filePath);
+            pfordayquil.alpha = 0f;
             flash = true;
             cg.alpha = 0.0f;
             delay = -1f;
@@ -106,6 +119,7 @@ public class ScreenShot : MonoBehaviour
                 display = false;
                 charCam.enabled = true;
                 canCam.enabled = false;
+                pfordayquil.alpha = 1f;
             }
         }
 
@@ -115,12 +129,16 @@ public class ScreenShot : MonoBehaviour
     {
         corruption += .125f;
         mixer.SetFloat("ChorusDepth", corruption);
+        chroma.intensity.value = corruption;
+        vignette.intensity.value = corruption;
+        whoops.intensity.value += 3;
+        bloomboy.intensity.value += 2;
     }
 
     void RandomizeImage(UnityEngine.UI.Image i)
     {
         RectTransform rect = i.GetComponent<RectTransform>();
         rect.Rotate(new Vector3(0, 0, Random.Range(-45, 45)));
-        rect.anchoredPosition = new Vector2(Random.Range(-600, 600), Random.Range(-300, 300));
+        rect.anchoredPosition = new Vector2(Random.Range(-400, 400), Random.Range(-150, 150));
     }
 }
