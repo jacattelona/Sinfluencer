@@ -79,6 +79,7 @@ public class ScreenShot : MonoBehaviour
                     {
                         int rand = Random.Range(0, suffering.Length);
                         i.sprite = suffering[rand];
+                        RandomizeImage(i);
                     }
                     UpdateMusic();
                 }
@@ -116,6 +117,8 @@ public class ScreenShot : MonoBehaviour
 
     void RandomizeImage(UnityEngine.UI.Image i)
     {
-
+        RectTransform rect = i.GetComponent<RectTransform>();
+        rect.Rotate(new Vector3(0, 0, Random.Range(-45, 45)));
+        rect.anchoredPosition = new Vector2(Random.Range(-240, 240), Random.Range(-100, 100));
     }
 }
