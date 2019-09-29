@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.Windows;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using System.IO;
 
 public class ScreenShot : MonoBehaviour
 {
-    string filePath = "TestName.png";
+    string filePath = "";
     public CanvasGroup cg;
     public UnityEngine.UI.Image theImage;
 
@@ -31,6 +32,7 @@ public class ScreenShot : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        filePath = Application.dataPath + "\\TestName.png";
         canCam.enabled = false;
         charCam.enabled = true;
         suffering = Resources.LoadAll<Sprite>("");
@@ -45,7 +47,7 @@ public class ScreenShot : MonoBehaviour
             ScreenCapture.CaptureScreenshot(filePath);
             flash = true;
             cg.alpha = 0.0f;
-            delay = 0;
+            delay = -1f;
         }
 
         if (flash)
@@ -63,9 +65,9 @@ public class ScreenShot : MonoBehaviour
                     Texture2D tex = null;
                     byte[] fileData;
 
-                    if (File.Exists(filePath))
+                    if (System.IO.File.Exists(filePath))
                     {
-                        fileData = File.ReadAllBytes(filePath);
+                        fileData = System.IO.File.ReadAllBytes(filePath);
                         tex = new Texture2D(2, 2);
                         tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
 
@@ -119,6 +121,6 @@ public class ScreenShot : MonoBehaviour
     {
         RectTransform rect = i.GetComponent<RectTransform>();
         rect.Rotate(new Vector3(0, 0, Random.Range(-45, 45)));
-        rect.anchoredPosition = new Vector2(Random.Range(-240, 240), Random.Range(-100, 100));
+        rect.anchoredPosition = new Vector2(Random.Range(-600, 600), Random.Range(-300, 300));
     }
 }
