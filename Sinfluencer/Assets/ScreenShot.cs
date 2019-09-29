@@ -1,29 +1,31 @@
 ﻿using System.Collections;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Windows;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ScreenShot : MonoBehaviour
 {
-    string filePath = "C:\\Users\\Jordan\\Desktop\\TestName.png";
-    public GameObject canvas;
+    string filePath = "TestName.png";
     public CanvasGroup cg;
+    public UnityEngine.UI.Image theImage;
 
+    public UnityStandardAssets.Characters.FirstPerson.FirstPersonController firstPerson;
     public Camera charCam;
     public Camera canCam;
 
+    public Sprite[] suffering;
+    public UnityEngine.UI.Image[] images;
+
     bool flash = false;
+    bool display = false;
     float delay = 0;
+    float picTime = 0;
 
-    enum Flash
-    {
-        None,
-        Delay,
-        Flash
-    }
+    int corruption = 0;
 
-    Flash state = Flash.None;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,12 +36,9 @@ public class ScreenShot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P) && !display)
         {
             ScreenCapture.CaptureScreenshot(filePath);
-            print("Printed screenshot");
-
-            //state = Flash.Delay;
             flash = true;
             cg.alpha = 0.0f;
             delay = 0;
@@ -52,6 +51,7 @@ public class ScreenShot : MonoBehaviour
                 delay += Time.deltaTime;
                 if (delay >= .1)
                 {
+                    firstPerson.EnableMove(false);
                     charCam.enabled = false;
                     canCam.enabled = true;
                     cg.alpha = 1.0f;
@@ -65,10 +65,16 @@ public class ScreenShot : MonoBehaviour
                         tex = new Texture2D(2, 2);
                         tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
 
-                        canvas.GetComponent<Renderer>().material.mainTexture = tex;
+                        theImage.sprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
                     }
 
-                    print("Rendered Screenshot");
+                    picTime = 3f;
+                    display = true;
+
+                    for (int i = 0; i < images.Length; i++)
+                    {
+                        images[i].sprite = suffering[i];
+                    }
                 }
 
             }
@@ -83,22 +89,18 @@ public class ScreenShot : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (display)
         {
-            Texture2D tex = null;
-            byte[] fileData;
+            picTime -= Time.deltaTime;
 
-            if (File.Exists(filePath))
+            if (picTime <= 0)
             {
-                fileData = File.ReadAllBytes(filePath);
-                tex = new Texture2D(2, 2);
-                tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-
-                canvas.GetComponent<Renderer>().material.mainTexture = tex;
+                firstPerson.EnableMove(true);
+                display = false;
+                charCam.enabled = true;
+                canCam.enabled = false;
             }
-
-            print("Rendered Screenshot");
-
         }
+
     }
 }
